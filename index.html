@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rubik Master</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6d4aff">
+<link rel="icon" href="icons/icon.svg">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root{--bg:#f4f4f8;--card:#fff;--tx:#18181f;--mu:#6b6b7a;--ac:#6d4aff;--bd:#e0e0ea;--ok:#1db954;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121018;--card:#1d1a27;--tx:#f1f0f6;--mu:#9a98a8;--ac:#a58bff;--bd:#2f2b3d}}
+:root[data-theme="dark"]{--bg:#121018;--card:#1d1a27;--tx:#f1f0f6;--mu:#9a98a8;--ac:#a58bff;--bd:#2f2b3d}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+main{max-width:560px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:4px 0 12px}h2{font-size:17px;margin:0 0 6px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:14px}
+#net{display:grid;grid-template-columns:repeat(12,var(--s));grid-template-rows:repeat(9,var(--s));gap:2px;justify-content:center;--s:min(7.3vw,30px)}
+#net i{border-radius:4px;display:block}#net i.e{background:transparent}
+.row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+button{font:inherit;font-size:14px;border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:10px;padding:8px 11px;cursor:pointer}
+button.p,button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+button:disabled{opacity:.5}.mv{min-width:44px;font-weight:700}
+.tabs{display:flex;gap:6px;margin-bottom:12px}.tabs button{flex:1;padding:10px}
+.alg{font-family:ui-monospace,Menlo,monospace;font-size:15px;background:var(--bg);border-radius:10px;padding:10px;margin:6px 0;word-spacing:4px}
+.alg b{background:var(--ac);color:#fff;border-radius:4px;padding:0 3px}
+.pal button{width:38px;height:38px;padding:0;border:3px solid var(--bd)}.pal button.on{border-color:var(--tx)}
+.step{display:flex;gap:10px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:8px 10px;margin-bottom:6px;cursor:pointer;background:var(--card);font-size:14px}
+.step.on{border-color:var(--ac)}
+.n{width:26px;height:26px;border-radius:50%;background:var(--bd);display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
+.step.done .n{background:var(--ok);color:#fff}
+.bar{height:8px;background:var(--bd);border-radius:8px;overflow:hidden;margin:4px 0 12px}.bar div{height:100%;background:var(--ok);width:0;transition:width .3s}
+.cam{position:relative;width:100%;aspect-ratio:1;background:#000;border-radius:12px;overflow:hidden}
+.cam video{width:100%;height:100%;object-fit:cover}
+.grid{position:absolute;left:15%;top:15%;width:70%;height:70%;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);border:2px solid #fff}
+.grid i{border:1px solid rgba(255,255,255,.7)}
+.sw{display:inline-block;width:16px;height:16px;border-radius:3px;margin:1px}
+ul{padding-left:18px;margin:6px 0}small,.mu{color:var(--mu);font-size:13px}
+.msg{margin-top:8px;font-size:14px}
+#stage{height:270px;perspective:800px;position:relative;touch-action:none;cursor:grab;overflow:hidden}
+#scene{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d;transform:rotateX(-28deg) rotateY(-38deg)}
+.st{position:absolute;left:-23px;top:-23px;width:46px;height:46px;border:3px solid #111;border-radius:7px;box-sizing:border-box;backface-visibility:hidden}
+</style></head><body><main>
+<h1>🧩 Rubik Master</h1>
+<div class="card">
+<div class="row" style="margin:0 0 8px"><button id="v3" class="on">🧊 3D</button><button id="v2">▦ Sơ đồ phẳng</button></div>
+<div id="stage"><div id="scene"></div></div>
+<small id="hint">Kéo để xoay khối 3D.</small>
+<div id="net"></div>
+<div class="row" id="mvs"></div>
+<div class="row"><button class="p" id="scr">🔀 Xáo trộn</button><button id="und">↩ Hoàn tác</button><button id="rst">✔ Khối đã giải</button></div>
+</div>
+<div class="tabs"><button id="t0" class="on">📚 Học</button><button id="t1">📷 Quét & Giải</button></div>
+
+<section id="p0">
+<div class="row" id="lvs" style="margin:0 0 8px"></div>
+<div class="bar"><div id="pg"></div></div>
+<div id="steps"></div>
+<div class="card" id="lesson"></div>
+<div class="card"><h2>Ký hiệu</h2><ul><li><b>U D L R F B</b> = trên, dưới, trái, phải, trước, sau. Ký hiệu ' là ngược chiều kim đồng hồ, 2 là xoay hai lần.</li><li>Cầm khối: mặt trắng lên trên, xanh lá hướng về bạn. Sơ đồ phẳng: hàng trên U; hàng giữa L F R B; hàng dưới D.</li></ul></div>
+</section>
+
+<section id="p1" hidden>
+<div class="card">
+<h2>1. Quét 6 mặt bằng camera</h2>
+<div id="ins" class="msg"></div>
+<div class="cam"><video id="vd" playsinline muted></video><div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+<div class="row"><button class="p" id="cam">🎥 Bật camera</button><button id="snap" disabled>📸 Chụp mặt này</button><button class="p" id="cap">📷 Chụp bằng camera máy</button><button onclick="fi.click()">🖼 Chọn ảnh</button><button id="rs">Quét lại</button></div>
+<input type="file" id="fi" accept="image/*" hidden><input type="file" id="fc" accept="image/*" capture="environment" hidden>
+<div id="got" class="msg"></div>
+<small>Đặt mặt khối vừa khít khung 3×3, đủ sáng, tránh bóng và chói. Màu được so với ô tâm của 6 mặt.</small>
+</div>
+<div class="card">
+<h2>2. Kiểm tra màu</h2>
+<small>Chọn một màu rồi chạm vào ô sai trên sơ đồ khối để sửa.</small>
+<div class="row pal" id="pal"></div>
+<h2 style="margin-top:14px">3. Giải</h2>
+<div class="row"><button class="p" id="sv">⚡ Tìm lời giải</button></div>
+<div class="msg" id="sm"></div>
+<div class="alg" id="sol" hidden></div>
+<div class="row" id="ctl" hidden><button id="pv">‹</button><button id="nx">›</button><button class="p" id="au">▶ Tự chạy</button></div>
+</div>
+</section>
+</main>
+<script src="lib/cube.js"></script>
+<script src="lib/solve.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const COL={U:'#f5f5f5',D:'#ffd500',F:'#1db954',B:'#1e6fff',R:'#e53935',L:'#ff8a00'};
+const AX={U:[0,1,0],D:[0,-1,0],R:[1,0,0],L:[-1,0,0],F:[0,0,1],B:[0,0,-1]};
+const OFF={U:[3,0],R:[6,3],F:[3,3],D:[3,6],L:[0,3],B:[9,3]},FO='URFDLB',INV={};
+for(const k in COL)INV[COL[k]]=k;
+let S=[],hist=[],busy=false;
+function init(){S=[];for(let x=-1;x<2;x++)for(let y=-1;y<2;y++)for(let z=-1;z<2;z++)for(const f in AX){const a=AX[f];if(x*a[0]+y*a[1]+z*a[2]===1)S.push({p:[x,y,z],n:a.slice(),c:COL[f]})}}
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const rot=(v,a)=>{const c=cross(a,v),d=dot(a,v);return v.map((_,i)=>Math.round(-c[i]+a[i]*d)+0)};
+function turn(f,t){const a=AX[f];for(let k=0;k<t;k++)for(const s of S)if(dot(s.p,a)>0){s.p=rot(s.p,a);s.n=rot(s.n,a)}}
+function pos(s){const[x,y,z]=s.p,n=s.n;
+ if(n[1]===1)return[3+x+1,z+1];if(n[1]===-1)return[3+x+1,7-z];
+ if(n[2]===1)return[3+x+1,4-y];if(n[0]===1)return[7-z,4-y];
+ if(n[2]===-1)return[10-x,4-y];return[z+1,4-y]}
+const net=$('net');for(let i=0;i<108;i++)net.appendChild(document.createElement('i')).className='e';
+function draw(){for(const c of net.children){c.className='e';c.style.background='';c._s=null}
+ for(const s of S){const[c,r]=pos(s),e=net.children[r*12+c];e.className='';e.style.background=s.c;e._s=s}d3()}
+const parse=t=>({f:t[0],t:t.endsWith('2')?2:t.endsWith("'")?3:1});
+function mv(tok,rec=true){const m=parse(tok);turn(m.f,m.t);if(rec)hist.push(m);draw()}
+for(const f of 'UDLRFB')for(const s of ['',"'"]){const b=document.createElement('button');b.className='mv';b.textContent=f+s;b.onclick=()=>!busy&&mv(f+s);$('mvs').appendChild(b)}
+$('scr').onclick=()=>{if(busy)return;for(let i=0;i<22;i++)mv('UDLRFB'[Math.random()*6|0]+['',"'",'2'][Math.random()*3|0])};
+$('und').onclick=()=>{if(busy)return;const m=hist.pop();if(m){turn(m.f,4-m.t);draw()}};
+$('rst').onclick=()=>{if(busy)return;init();hist=[];draw()};
+const lock=v=>{busy=v;document.querySelectorAll('button').forEach(b=>b.disabled=v)};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const alH=(a,h=-1)=>a.split(' ').map((m,i)=>i===h?'<b>'+m+'</b>':m).join(' ');
+async function play(a,el,rec=true){if(busy)return;lock(true);const t=a.split(' ');for(let i=0;i<t.length;i++){el.innerHTML=alH(a,i);mv(t[i],rec);await sleep(420)}el.innerHTML=alH(a);lock(false);$('snap').disabled=!stream}
+
+/* ---- Học ---- */
+const LV=[
+{n:'Cơ bản',l:[
+['Dấu cộng trắng','Ghép 4 cạnh trắng quanh tâm trắng ở mặt trên, màu bên khớp tâm kề bên. Bước này nhìn và suy nghĩ là chính.',[],['Đưa cạnh trắng xuống lớp dưới, xoay cho khớp tâm, rồi xoay mặt đó 180° (ví dụ F2).']],
+['Góc trắng','Hoàn thành lớp trắng. Đặt góc trắng ở lớp dưới, ngay dưới vị trí cần đến (phải trước) rồi lặp công thức.',[['Lặp 1-5 lần',"R' D' R D"]],['Lặp đến khi góc vào đúng chỗ, mặt trắng hiện lên.']],
+['Lớp giữa','Lật lớp trắng xuống dưới. Tìm cạnh không có màu vàng ở mặt trên, khớp màu trước với tâm rồi đưa sang phải hoặc trái.',[['Sang phải',"U R U' R' U' F' U F"],['Sang trái',"U' L' U L U F U' F'"]],[]],
+['Dấu cộng vàng','Tạo dấu cộng vàng ở mặt trên. Chữ L đặt góc trên trái, đường thẳng nằm ngang.',[['Công thức',"F R U R' U' F'"]],['Chấm: làm 1 lần, nhìn lại hình rồi làm tiếp (1-3 lần).']],
+['Mặt vàng','Làm cả mặt trên vàng bằng Sune. Một góc vàng hướng lên ở góc trên trái phía trước.',[['Sune',"R U R' U R U2 R'"]],['Lặp đến khi đủ 4 góc vàng, xoay U giữa các lần.']],
+['Đổi chỗ góc','Đưa 4 góc vào đúng vị trí. Tìm hai góc có màu bên giống nhau (đèn pha) đặt ở phía sau.',[['Hoán góc',"U R U' L' U R' U' L"]],['Không có đèn pha: làm một lần rồi tìm lại.']],
+['Đổi chỗ cạnh','Bước cuối: hoán 3 cạnh còn lại, cạnh đúng đặt phía sau.',[['Ua-perm',"R U' R U R U R U' R' U' R2"]],['Chưa xong thì làm lại. Chúc mừng bạn! 🎉']]]},
+{n:'Trung cấp',l:[
+['Thao tác nhanh','Luyện ngón tay và nhìn trước. Hai chuỗi này là nền của mọi công thức nhanh.',[['Sexy move',"R U R' U'"],['Sledgehammer',"R' F R F'"]],['Xoay bằng ngón, không đổi tay cầm, nhìn trước ô tiếp theo khi đang xoay.']],
+['F2L (lớp 1+2)','Ghép góc trắng với cạnh giữa thành một cặp rồi đưa vào cùng lúc, thay cho hai bước góc và lớp giữa.',[['Cặp vào phải',"R U R'"],['Cặp vào trái',"F' U' F"],['Tách rồi ghép',"R U' R' U R U R'"]],['Nhận ra cặp rồi mới đưa xuống, tránh xoay thừa.']],
+['OLL 2 bước','Hoàn thành mặt vàng: bước 1 làm dấu cộng, bước 2 làm 4 góc.',[['Đường thẳng',"F R U R' U' F'"],['Chữ L',"F U R U' R' F'"],['Sune',"R U R' U R U2 R'"],['Anti-Sune',"R U2 R' U' R U' R'"]],[]],
+['PLL 2 bước','Hoán đổi góc rồi cạnh để hoàn thiện.',[['Y-perm (góc chéo)',"F R U' R' U' R U R' F' R U R' U' R' F R F'"],['Ua-perm',"R U' R U R U R U' R' U' R2"],['Ub-perm',"R2 U R U R' U' R' U' R' U R'"]],[]]]},
+{n:'Nâng cao',l:[
+['PLL đầy đủ','Học nhận biết và làm trực tiếp từng trường hợp thay vì hai bước, giúp tiết kiệm hàng chục nước.',[['T-perm',"R U R' U' R' F R2 U' R' U' R U R' F'"],['J-perm',"R U R' F' R U R' U' R' F R2 U' R'"],['H-perm',"R2 U2 R U2 R2 U2 R2 U2 R U2 R2"]],['Luyện nhận ra theo "đèn pha", khối 3 màu và hình cái cầu.']],
+['Chiến thuật thi đấu','Không có công thức mới, chỉ có thói quen: giải cross ở mặt dưới, nhìn trước 2-3 ô khi F2L, chọn cặp dễ nhất trước, nhịp xoay đều, chạm khối ít dừng.',[],['Phân tích 1 phút 15 giây xuống 30 giây: đo thời gian từng giai đoạn để biết chỗ yếu.','Xem tiếp: COLL, ZBLL, Roux, ZZ, Petrus để tối ưu thêm.']]]}];
+let lv=0,li=0,done=[];try{done=JSON.parse(localStorage.getItem('rb2')||'[]')}catch(e){}
+const key=(a,b)=>a+'-'+b;
+function save(){try{localStorage.setItem('rb2',JSON.stringify(done))}catch(e){}}
+function rLv(){$('lvs').innerHTML='';LV.forEach((v,i)=>{const b=document.createElement('button');b.textContent=v.n;b.className=i===lv?'on':'';b.onclick=()=>{lv=i;li=0;rAll()};$('lvs').appendChild(b)})}
+function rSteps(){const L=LV[lv].l;$('steps').innerHTML='';L.forEach((l,i)=>{const d=document.createElement('div'),k=done.includes(key(lv,i));d.className='step'+(i===li?' on':'')+(k?' done':'');d.innerHTML='<span class="n">'+(k?'✓':i+1)+'</span>'+l[0];d.onclick=()=>{li=i;rSteps();rLes()};$('steps').appendChild(d)});
+ $('pg').style.width=L.filter((_,i)=>done.includes(key(lv,i))).length/L.length*100+'%'}
+function rLes(){const l=LV[lv].l[li],k=key(lv,li);let h='<h2>'+l[0]+'</h2><p>'+l[1]+'</p>';
+ l[2].forEach((a,j)=>{h+='<div class="mu">'+a[0]+'</div><div class="alg" id="al'+j+'">'+alH(a[1])+'</div><button class="p" data-j="'+j+'">▶ Thử trên khối</button>'});
+ if(l[3].length)h+='<ul>'+l[3].map(t=>'<li>'+t+'</li>').join('')+'</ul>';
+ h+='<div class="row"><button id="dn">'+(done.includes(k)?'Bỏ đánh dấu':'✓ Đã hiểu')+'</button>'+(li<LV[lv].l.length-1?'<button id="nxl">Bài tiếp ›</button>':'')+'</div>';
+ $('lesson').innerHTML=h;
+ $('lesson').querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>play(l[2][b.dataset.j][1],$('al'+b.dataset.j)));
+ $('dn').onclick=()=>{done=done.includes(k)?done.filter(x=>x!==k):[...done,k];save();rSteps();rLes()};
+ if($('nxl'))$('nxl').onclick=()=>{li++;rSteps();rLes()}}
+function rAll(){rLv();rSteps();rLes()}
+function tab(i){$('p0').hidden=i;$('p1').hidden=!i;$('t0').className=i?'':'on';$('t1').className=i?'on':''}
+$('t0').onclick=()=>tab(0);$('t1').onclick=()=>tab(1);
+
+/* ---- Quét ---- */
+const GUIDE={U:'Mặt TRÊN: hướng mặt có tâm trắng về camera, cạnh dưới là phía tâm xanh lá.',R:'Mặt PHẢI: xoay khối để mặt đỏ hướng về camera, giữ trắng ở phía trên.',F:'Mặt TRƯỚC: mặt xanh lá hướng về camera, trắng ở phía trên.',D:'Mặt DƯỚI: mặt vàng hướng về camera, cạnh trên là phía tâm xanh lá.',L:'Mặt TRÁI: mặt cam hướng về camera, trắng ở phía trên.',B:'Mặt SAU: mặt xanh dương hướng về camera, trắng ở phía trên.'};
+let k=0,scan={},stream=null;
+function rIns(){$('ins').innerHTML=k<6?'<b>Mặt '+(k+1)+'/6.</b> '+GUIDE[FO[k]]:'Đã quét đủ 6 mặt. Kiểm tra màu bên dưới.';
+ $('got').innerHTML=FO.split('').map(f=>scan[f]?'<span>'+f+':'+scan[f].map(c=>'<i class="sw" style="background:rgb('+c+')"></i>').join('')+'</span> ':'').join('<br>')}
+function lab(c){let[r,g,b]=c.map(v=>{v/=255;return v>.04045?Math.pow((v+.055)/1.055,2.4):v/12.92});
+ let x=(.4124*r+.3576*g+.1805*b)/.95047,y=.2126*r+.7152*g+.0722*b,z=(.0193*r+.1192*g+.9505*b)/1.08883;
+ const f=t=>t>.008856?Math.cbrt(t):7.787*t+16/116;return[116*f(y)-16,500*(f(x)-f(y)),200*(f(y)-f(z))]}
+function sample(src,w,h){const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d');x.drawImage(src,0,0,w,h);
+ const side=Math.min(w,h)*.7,ox=(w-side)/2,oy=(h-side)/2,cs=side/3,p=Math.max(2,cs*.3|0),out=[];
+ for(let i=0;i<9;i++){const cx=ox+(i%3+.5)*cs-p/2,cy=oy+((i/3|0)+.5)*cs-p/2,d=x.getImageData(cx,cy,p,p).data;let r=0,g=0,b=0,n=d.length/4;
+  for(let j=0;j<d.length;j+=4){r+=d[j];g+=d[j+1];b+=d[j+2]}out.push([r/n|0,g/n|0,b/n|0])}return out}
+function got(s){if(k>=6)return;scan[FO[k]]=s;k++;rIns();if(k===6)classify()}
+function stk(f,i){const c=OFF[f][0]+i%3,r=OFF[f][1]+(i/3|0);return S.find(s=>{const q=pos(s);return q[0]===c&&q[1]===r})}
+function classify(){const cen=FO.split('').map(f=>lab(scan[f][4]));
+ for(const f of FO)scan[f].forEach((c,i)=>{const l=lab(c);let b=0,bd=1e9;cen.forEach((m,j)=>{const d=(l[0]-m[0])**2+(l[1]-m[1])**2+(l[2]-m[2])**2;if(d<bd){bd=d;b=j}});stk(f,i).c=COL[FO[b]]});
+ draw();$('sm').textContent='Đã nhận diện màu. Hãy kiểm tra và sửa ô sai trước khi giải.'}
+$('cam').onclick=async()=>{try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}}});$('vd').srcObject=stream;await $('vd').play();$('snap').disabled=false}catch(e){$('got').textContent='Không bật được camera trực tiếp ('+(e.name||'lỗi')+'). Trang nhúng hoặc trình duyệt có thể chặn quyền camera. Hãy bấm "Chụp bằng camera máy" (mở app camera của điện thoại), mỗi lần chụp một mặt.'}};
+$('snap').onclick=()=>{const v=$('vd');if(v.videoWidth)got(sample(v,v.videoWidth,v.videoHeight))};
+$('cap').onclick=()=>$('fc').click();
+$('fi').onchange=$('fc').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{got(sample(im,im.naturalWidth,im.naturalHeight));URL.revokeObjectURL(im.src)};im.src=URL.createObjectURL(f);e.target.value=''};
+$('rs').onclick=()=>{k=0;scan={};rIns()};
+let pc=null;
+for(const f of FO){const b=document.createElement('button');b.style.background=COL[f];b.onclick=()=>{pc=pc===f?null:f;[...$('pal').children].forEach(x=>x.className='');if(pc)b.className='on'};$('pal').appendChild(b)}
+net.onclick=e=>{if(pc&&e.target._s){e.target._s.c=COL[pc];draw()}};
+
+/* ---- Giải ---- */
+let sol=[],si=0,ready=false;
+function toFL(){let r='';for(const f of FO)for(let i=0;i<9;i++)r+=INV[stk(f,i).c]||'?';return r}
+function rSol(){$('sol').innerHTML=alH(sol.join(' '),si-1)}
+$('sv').onclick=()=>{const s=toFL(),sm=$('sm');
+ for(const f of FO)if(s.split(f).length!==10){sm.textContent='Mỗi màu phải có đúng 9 ô. Hãy sửa lại màu.';return}
+ sm.textContent=ready?'Đang tính...':'Đang khởi tạo bộ giải (vài giây)...';
+ setTimeout(()=>{try{if(!ready){Cube.initSolver();ready=true}
+  const m=Cube.fromString(s).solve().trim();sol=m?m.split(/\s+/):[];si=0;
+  sm.textContent=sol.length?'Lời giải '+sol.length+' nước. Dùng ‹ › hoặc Tự chạy trên khối.':'Khối đã được giải.';
+  $('sol').hidden=$('ctl').hidden=!sol.length;rSol()}catch(e){sm.textContent='Màu không hợp lệ (khối không thể có thật). Kiểm tra lại các ô, nhất là góc và cạnh.'}},50)};
+$('nx').onclick=()=>{if(!busy&&si<sol.length){mv(sol[si++],false);rSol()}};
+$('pv').onclick=()=>{if(!busy&&si>0){const m=parse(sol[--si]);turn(m.f,4-m.t);draw();rSol()}};
+$('au').onclick=async()=>{if(busy)return;lock(true);while(si<sol.length){mv(sol[si++],false);rSol();await sleep(550)}lock(false);$('snap').disabled=!stream};
+
+/* ---- 3D ---- */
+const SC=$('scene'),SZ=46,el3=[];let rx=-28,ry=-38,dr=null,mvd=0;
+const ROT={'0,0,1':'','0,0,-1':'rotateY(180deg)','1,0,0':'rotateY(90deg)','-1,0,0':'rotateY(-90deg)','0,1,0':'rotateX(90deg)','0,-1,0':'rotateX(-90deg)'};
+function d3(){while(el3.length<S.length){const d=document.createElement('div');d.className='st';SC.appendChild(d);el3.push(d)}
+ S.forEach((s,i)=>{const d=el3[i];d._s=s;d.style.background=s.c;d.style.transform='translate3d('+s.p[0]*SZ+'px,'+(-s.p[1]*SZ)+'px,'+s.p[2]*SZ+'px) '+ROT[s.n.join()]+' translateZ('+SZ/2+'px)'})}
+function ap(){SC.style.transform='rotateX('+rx+'deg) rotateY('+ry+'deg)'}
+const stg=$('stage');
+stg.onpointerdown=e=>{dr=[e.clientX,e.clientY];mvd=0};
+addEventListener('pointermove',e=>{if(!dr)return;const dx=e.clientX-dr[0],dy=e.clientY-dr[1];mvd+=Math.abs(dx)+Math.abs(dy);ry+=dx*.6;rx=Math.max(-89,Math.min(89,rx-dy*.6));dr=[e.clientX,e.clientY];ap()});
+addEventListener('pointerup',()=>dr=null);addEventListener('pointercancel',()=>dr=null);
+stg.onclick=e=>{if(mvd<6&&pc&&e.target._s){e.target._s.c=COL[pc];draw()}};
+function vw(b){stg.style.display=b?'':'none';$('hint').style.display=b?'':'none';net.style.display=b?'none':'';$('v3').className=b?'on':'';$('v2').className=b?'':'on'}
+$('v3').onclick=()=>vw(1);$('v2').onclick=()=>vw(0);
+init();draw();rAll();rIns();ap();vw(1);
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script></body></html>
