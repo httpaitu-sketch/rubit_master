@@ -41,11 +41,106 @@ ul{padding-left:18px;margin:6px 0}small,.mu{color:var(--mu);font-size:13px}
 #stage{height:270px;perspective:800px;position:relative;touch-action:none;cursor:grab;overflow:hidden}
 #scene{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d;transform:rotateX(-28deg) rotateY(-38deg)}
 .st{position:absolute;left:-23px;top:-23px;width:46px;height:46px;border:3px solid #111;border-radius:7px;box-sizing:border-box;backface-visibility:hidden}
+
+:root{--scrim:rgba(244,244,248,.72);--cardA:rgba(255,255,255,.86)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--scrim:rgba(18,16,24,.74);--cardA:rgba(29,26,39,.86)}}
+:root[data-theme="dark"]{--scrim:rgba(18,16,24,.74);--cardA:rgba(29,26,39,.86)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(var(--scrim),var(--scrim)),url(bg.jpg) center/cover no-repeat}
+.card,.step{background:var(--cardA);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+/* nen ro hon */
+:root{--scrim:rgba(244,244,248,.28);--cardA:rgba(255,255,255,.72)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--scrim:rgba(18,16,24,.36);--cardA:rgba(24,21,33,.66)}}
+:root[data-theme="dark"]{--scrim:rgba(18,16,24,.36);--cardA:rgba(24,21,33,.66)}
+button{background:var(--cardA);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+button.p,button.on{background:var(--ac)}
+h1{display:inline-block;background:var(--cardA);padding:4px 16px;border-radius:14px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.card{padding:12px}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.hd h1{margin:0;font-size:19px;padding:4px 12px}
+.hd .row{margin:0;flex-wrap:nowrap}
+.hd button{padding:8px 11px}
+#cubecard{background:transparent;border-color:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;padding:0}
+#stage{background:transparent}
+#hint{display:inline-block;background:var(--cardA);padding:2px 10px;border-radius:10px}
+
+/* Rubik Master: storefront background integration */
+body{background:var(--bg);min-height:100dvh}
+body::before{background:url("header.jpg") top center/100% 100% no-repeat;position:absolute;top:0;left:50%;transform:translateX(-50%);width:var(--W);height:calc(var(--W)*0.259);z-index:-1;pointer-events:none}
+:root{--cardA:rgba(255,255,255,.84);--scrim:rgba(0,0,0,0)}
+:root[data-theme="dark"]{--cardA:rgba(23,22,43,.83);--scrim:rgba(0,0,0,0)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--cardA:rgba(23,22,43,.83);--scrim:rgba(0,0,0,0)}}
+.hd{padding:7px 8px;border-radius:17px;background:rgba(15,19,47,.76);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.hd h1{color:#fff;background:transparent;text-shadow:0 1px 5px #0008}
+#cubecard{background:transparent}
+#stage{height:clamp(260px,43vh,380px);filter:drop-shadow(0 9px 12px rgba(0,0,0,.36))}
+#hint{color:#fff;background:rgba(14,19,43,.79);padding:7px 12px}
+#mvs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+#mvs button{min-width:0;padding:12px 3px;background:rgba(20,22,48,.85);color:#fff;border:1px solid rgba(157,147,255,.5);font-size:17px}
+.card,.step,.tabs button,.row button{backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+@media(max-width:380px){main{padding:10px}.hd h1{font-size:17px}.hd button{padding:7px}#mvs{gap:5px}}
+/* header gon + thanh chuc nang duoi */
+.hd{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;padding:4px 8px;border-radius:14px;margin-bottom:8px}
+.hd h1{font-size:16px;padding:0}
+.hd button{padding:5px 10px;font-size:13px;border-radius:9px}
+#stage{height:clamp(200px,32vh,290px)}
+#mvs{grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}
+#mvs button{padding:9px 2px;font-size:15px}
+main{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px))}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));background:rgba(12,14,36,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);justify-content:center;gap:10px}
+.tabs button{max-width:240px;padding:10px 6px;background:transparent;border-color:transparent;color:#fff}
+.tabs button.on{background:var(--ac);border-color:var(--ac)}
+/* anh cua hang lam nen app */
+:root{--W:min(100vw,560px)}
+body{background:#6f72a6}
+.hd{position:static;margin:calc(var(--W)*.642 - 16px) 0 0;padding:calc(var(--W)*.176) 0 8px;background:none;border-radius:0;backdrop-filter:none;-webkit-backdrop-filter:none;display:block}
+.hd h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);padding:0;margin:0}
+.hd .row{justify-content:center;gap:10px}
+.hd button{padding:7px 18px;font-size:14px;background:rgba(14,19,43,.72);color:#fff;border-color:rgba(157,147,255,.6)}
+.hd button.on{background:var(--ac)}
+/* header: anh bien hieu + thanh ten app */
+body{background:var(--bg)}
+.hd{position:static;margin:calc(var(--W)*0.259 - 16px) 0 10px;padding:7px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:linear-gradient(90deg,#0d1240,#2b1d6e);border:1px solid rgba(130,150,255,.75);border-radius:14px;box-shadow:0 0 14px rgba(90,110,255,.45)}
+.hd h1{position:static;width:auto;height:auto;overflow:visible;clip:auto;margin:0;padding:0;background:none;color:#fff;font-size:19px;font-style:italic;white-space:nowrap}
+.hd h1 span{color:#ffd500}
+.hd .row{margin:0;flex-wrap:nowrap;gap:6px}
+.hd button{padding:6px 13px;font-size:14px}
+/* header v2: anh + thanh ten trong mot khung */
+body::before{display:none}
+.sign{aspect-ratio:881/140;background:url("header.jpg") center/100% 100% no-repeat;border-radius:14px 14px 0 0;border:1px solid rgba(130,150,255,.75);border-bottom:0;box-shadow:0 0 14px rgba(90,110,255,.45)}
+.hd{margin:0 0 10px;border-radius:0 0 14px 14px;border-top:0;flex-wrap:nowrap;padding:6px 10px}
+.hd h1{flex:1;min-width:0;font-size:17px;overflow:hidden;text-overflow:ellipsis}
+.hd .row{flex:none}
+.hd button{white-space:nowrap;padding:6px 11px;font-size:13px}
+/* chu chay ngang */
+.tick{overflow:hidden;white-space:nowrap;background:linear-gradient(90deg,#a8001c,#e53935,#a8001c);color:#fff;font-weight:700;font-size:13px;line-height:26px;border:1px solid rgba(130,150,255,.75);border-width:0 1px}
+.tk{display:inline-block;animation:mq 26s linear infinite;will-change:transform}
+.tk span{display:inline-block}
+@keyframes mq{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.tk{animation-duration:90s}}
+/* co dinh header khi cuon */
+.stk{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;margin-bottom:10px;border-radius:0 0 14px 14px;box-shadow:0 8px 14px -6px rgba(0,0,0,.45)}
+.stk .hd{margin:0}
+/* nen shop co chieu sau + sua bong */
+body::before{content:"";display:block;position:fixed;top:0;left:0;right:0;bottom:0;transform:none;width:auto;height:auto;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(4,5,16,.25) 20%,rgba(4,5,16,.8) 100%),linear-gradient(rgba(4,5,16,.55),rgba(4,5,16,.5) 45%,rgba(4,5,16,.7)),url("shop-bg.jpg") center top/cover no-repeat}
+.sign,.hd{box-shadow:none}
+.stk{box-shadow:none;border-bottom:1px solid rgba(130,150,255,.5)}
+#stage{overflow:visible;filter:none;height:clamp(230px,36vh,310px)}
+#stage::after{content:"";position:absolute;left:50%;bottom:10px;width:150px;height:22px;margin-left:-75px;background:radial-gradient(ellipse,rgba(0,0,0,.55),transparent 70%);z-index:-1;pointer-events:none}
+.st{left:-19px;top:-19px;width:38px;height:38px;border-width:2px;border-radius:6px}
+.hd h1{font-size:17px;text-overflow:clip}
+/* quet tren khu vuc khoi rubik */
+#stage .cam{display:none;position:absolute;left:0;top:0;width:100%;height:100%;aspect-ratio:auto;border-radius:14px;z-index:2}
+#stage.scan .cam{display:block}
+#stage.scan #scene,#stage.scan::after{display:none}
+#stage.scan{height:clamp(260px,42vh,380px);overflow:hidden;border-radius:14px;touch-action:auto}
+/* ky hieu mat */
+.st{display:flex;align-items:center;justify-content:center;font:800 19px system-ui,sans-serif;user-select:none;-webkit-user-select:none}
+#net i{display:grid;place-items:center;font-weight:800;font-size:calc(var(--s)*.55);user-select:none;-webkit-user-select:none}
+#net i.e{display:block}
 </style></head><body><main>
-<h1>🧩 Rubik Master</h1>
-<div class="card">
-<div class="row" style="margin:0 0 8px"><button id="v3" class="on">🧊 3D</button><button id="v2">▦ Sơ đồ phẳng</button></div>
-<div id="stage"><div id="scene"></div></div>
+<div class="sign"></div><div class="stk"><div class="tick"><div class="tk"><span>💻 Laptop – Mua bán – Sửa chữa ✦ 📍 35 Lê Lợi – Đông Hà ✦ 💻 Laptop – Mua bán – Sửa chữa ✦ 📍 35 Lê Lợi – Đông Hà ✦ </span><span>💻 Laptop – Mua bán – Sửa chữa ✦ 📍 35 Lê Lợi – Đông Hà ✦ 💻 Laptop – Mua bán – Sửa chữa ✦ 📍 35 Lê Lợi – Đông Hà ✦ </span></div></div><div class="hd"><h1>🧩 Rubik <span>Master</span></h1><div class="row"><button id="v3" class="on">3D</button><button id="v2">2D</button></div></div></div>
+<div class="card" id="cubecard">
+<div id="stage"><div id="scene"></div><div class="cam"><video id="vd" playsinline muted></video><div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div>
 <small id="hint">Kéo để xoay khối 3D.</small>
 <div id="net"></div>
 <div class="row" id="mvs"></div>
@@ -65,7 +160,7 @@ ul{padding-left:18px;margin:6px 0}small,.mu{color:var(--mu);font-size:13px}
 <div class="card">
 <h2>1. Quét 6 mặt bằng camera</h2>
 <div id="ins" class="msg"></div>
-<div class="cam"><video id="vd" playsinline muted></video><div class="grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+
 <div class="row"><button class="p" id="cam">🎥 Bật camera</button><button id="snap" disabled>📸 Chụp mặt này</button><button class="p" id="cap">📷 Chụp bằng camera máy</button><button onclick="fi.click()">🖼 Chọn ảnh</button><button id="rs">Quét lại</button></div>
 <input type="file" id="fi" accept="image/*" hidden><input type="file" id="fc" accept="image/*" capture="environment" hidden>
 <div id="got" class="msg"></div>
@@ -102,8 +197,10 @@ function pos(s){const[x,y,z]=s.p,n=s.n;
  if(n[2]===1)return[3+x+1,4-y];if(n[0]===1)return[7-z,4-y];
  if(n[2]===-1)return[10-x,4-y];return[z+1,4-y]}
 const net=$('net');for(let i=0;i<108;i++)net.appendChild(document.createElement('i')).className='e';
-function draw(){for(const c of net.children){c.className='e';c.style.background='';c._s=null}
- for(const s of S){const[c,r]=pos(s),e=net.children[r*12+c];e.className='';e.style.background=s.c;e._s=s}d3()}
+function fl(s){const n=s.n,p=s.p;if(p[0]!==n[0]||p[1]!==n[1]||p[2]!==n[2])return'';return n[1]===1?'U':n[1]===-1?'D':n[0]===1?'R':n[0]===-1?'L':n[2]===1?'F':'B'}
+const INK=c=>(c==='#f5f5f5'||c==='#ffd500')?'#111':'#fff';
+function draw(){for(const c of net.children){c.className='e';c.style.background='';c._s=null;c.textContent=''}
+ for(const s of S){const[c,r]=pos(s),e=net.children[r*12+c];e.className='';e.style.background=s.c;e._s=s;e.textContent=fl(s);e.style.color=INK(s.c)}d3()}
 const parse=t=>({f:t[0],t:t.endsWith('2')?2:t.endsWith("'")?3:1});
 function mv(tok,rec=true){const m=parse(tok);turn(m.f,m.t);if(rec)hist.push(m);draw()}
 for(const f of 'UDLRFB')for(const s of ['',"'"]){const b=document.createElement('button');b.className='mv';b.textContent=f+s;b.onclick=()=>!busy&&mv(f+s);$('mvs').appendChild(b)}
@@ -193,18 +290,26 @@ $('pv').onclick=()=>{if(!busy&&si>0){const m=parse(sol[--si]);turn(m.f,4-m.t);dr
 $('au').onclick=async()=>{if(busy)return;lock(true);while(si<sol.length){mv(sol[si++],false);rSol();await sleep(550)}lock(false);$('snap').disabled=!stream};
 
 /* ---- 3D ---- */
-const SC=$('scene'),SZ=46,el3=[];let rx=-28,ry=-38,dr=null,mvd=0;
+const SC=$('scene'),SZ=38,el3=[];let rx=-28,ry=-38,dr=null,mvd=0;
 const ROT={'0,0,1':'','0,0,-1':'rotateY(180deg)','1,0,0':'rotateY(90deg)','-1,0,0':'rotateY(-90deg)','0,1,0':'rotateX(90deg)','0,-1,0':'rotateX(-90deg)'};
 function d3(){while(el3.length<S.length){const d=document.createElement('div');d.className='st';SC.appendChild(d);el3.push(d)}
- S.forEach((s,i)=>{const d=el3[i];d._s=s;d.style.background=s.c;d.style.transform='translate3d('+s.p[0]*SZ+'px,'+(-s.p[1]*SZ)+'px,'+s.p[2]*SZ+'px) '+ROT[s.n.join()]+' translateZ('+SZ/2+'px)'})}
+ S.forEach((s,i)=>{const d=el3[i];d._s=s;d.style.background=s.c;d.textContent=fl(s);d.style.color=INK(s.c);d.style.transform='translate3d('+s.p[0]*SZ+'px,'+(-s.p[1]*SZ)+'px,'+s.p[2]*SZ+'px) '+ROT[s.n.join()]+' translateZ('+SZ/2+'px)'})}
 function ap(){SC.style.transform='rotateX('+rx+'deg) rotateY('+ry+'deg)'}
 const stg=$('stage');
 stg.onpointerdown=e=>{dr=[e.clientX,e.clientY];mvd=0};
-addEventListener('pointermove',e=>{if(!dr)return;const dx=e.clientX-dr[0],dy=e.clientY-dr[1];mvd+=Math.abs(dx)+Math.abs(dy);ry+=dx*.6;rx=Math.max(-89,Math.min(89,rx-dy*.6));dr=[e.clientX,e.clientY];ap()});
+addEventListener('pointermove',e=>{if(!dr)return;const dx=e.clientX-dr[0],dy=e.clientY-dr[1];mvd+=Math.abs(dx)+Math.abs(dy);ry+=dx*.6;rx=Math.max(-70,Math.min(70,rx-dy*.6));dr=[e.clientX,e.clientY];ap()});
 addEventListener('pointerup',()=>dr=null);addEventListener('pointercancel',()=>dr=null);
 stg.onclick=e=>{if(mvd<6&&pc&&e.target._s){e.target._s.c=COL[pc];draw()}};
 function vw(b){stg.style.display=b?'':'none';$('hint').style.display=b?'':'none';net.style.display=b?'none':'';$('v3').className=b?'on':'';$('v2').className=b?'':'on'}
-$('v3').onclick=()=>vw(1);$('v2').onclick=()=>vw(0);
+stg.ondblclick=()=>{rx=-28;ry=-38;ap()};$('v3').onclick=()=>vw(1);$('v2').onclick=()=>vw(0);
+function fitGrid(){const v=$('vd'),s=$('stage'),g=document.querySelector('#stage .grid'),cw=s.clientWidth,ch=s.clientHeight;if(!cw)return;
+ const sd=v.videoWidth?Math.min(v.videoWidth,v.videoHeight)*.7*Math.max(cw/v.videoWidth,ch/v.videoHeight):Math.min(cw,ch)*.7;
+ g.style.width=g.style.height=sd+'px';g.style.left=(cw-sd)/2+'px';g.style.top=(ch-sd)/2+'px'}
+function enterScan(){const s=$('stage');s.classList.add('scan');s.style.display='';net.style.display='none';$('hint').style.display='none';fitGrid()}
+$('vd').addEventListener('loadedmetadata',fitGrid);addEventListener('resize',fitGrid);
+$('rs').addEventListener('click',enterScan);
+const _t=tab;tab=function(i){_t(i);if(i)enterScan();else{$('stage').classList.remove('scan');vw($('v3').className==='on'?1:0)}};
+const _c=classify;classify=function(){_c();$('stage').classList.remove('scan');vw(1)};
 init();draw();rAll();rIns();ap();vw(1);
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script></body></html>
